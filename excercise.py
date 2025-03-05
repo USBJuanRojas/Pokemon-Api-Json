@@ -20,8 +20,8 @@ collection = db["stats"]
 pokemon_list = ["pikachu", "bulbasaur", "charmander", "squirtle", "mew"]
 
 def obtenerDatos():
-    all_data = []  # Lista para almacenar datos de todos los Pokémon
-    documents = []  # Lista para insertar en MongoDB
+    all_data = []  
+    documents = []  
     
     for pokemon in pokemon_list:
         url = f"https://pokeapi.co/api/v2/pokemon/{pokemon}"
@@ -41,10 +41,8 @@ def obtenerDatos():
                 "value": s["base_stat"]
             })
         
-        # Preparamos el documento para MongoDB
         documents.append({"name": pokemon, "stats": stats})
     
-    # Insertar solo si hay nuevos documentos y evitar duplicados
     if documents:
         existing_names = {doc["name"] for doc in collection.find({}, {"name": 1})}
         new_docs = [doc for doc in documents if doc["name"] not in existing_names]
@@ -52,7 +50,6 @@ def obtenerDatos():
         if new_docs:
             collection.insert_many(new_docs)
     
-    # Convertir la lista en un DataFrame de pandas
     df = pd.DataFrame(all_data)
     
     return df
@@ -60,7 +57,6 @@ def obtenerDatos():
 # Obtener los datos
 dataF = obtenerDatos()
 
-# Creación de la aplicación Dash
 app = dash.Dash(__name__)
 app.layout = html.Div([
     html.H1("Estadísticas Base de Pokémon"),
